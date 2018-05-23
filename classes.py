@@ -28,7 +28,8 @@ def travel(journey, pc):
         trap = 10
     for _ in range(trek):
         if random.randint(0, 100) < attack:
-            #print("you were ambushed! take no damage(developer)")
+            damage = random.randint(0, 3)
+            print("you were ambushed! take {} combat damage".format(damage))
             continue
 
         if random.randint(0, 100) < trap:
@@ -68,19 +69,49 @@ class player:
 def camp(player):
     print("\nIt is time to camp, as the night grows longer.")
     print("What would you like to do")
-    actions = ["make fire", "find food", "wound care", "set trap"]
+    actions = ["make fire", "find food", "wound care", "set trap", "menu"]
     for _ in actions:
         print(_)
     decide = ""
     while True:
         char = getch.getch()
         print(char, "")
-        if char == "\n" and decide in actions:
-            print("you have decided to {}".format(decide))
-            ui.prompt("Is this correct", decide)
+        if char == "\n":
+            for _ in actions:
+                if decide in _:
+                    print("you have decided to {}".format(decide))
+                    do(decide, player)
+
+            decide = ""
 
         elif char == "\n" and decide not in actions:
             decide = ""
-            print("input invalid")
+            print("\rreset", "\r")
 
         decide += char
+
+
+def do(decide, player):
+    if decide[2] == "k":
+        print("you gather wood and make a fire\nnighttime attacks prevented")
+        # no nighttime ambushes
+
+    elif decide[0] == "f":
+        print("food gathered")
+        # adds food
+        # also adds water
+
+    elif decide[0] == "w":
+        heal = random.randint(1, 4)
+        print("wounds bandaged successfully, {} hp healed".format(heal))
+        player.hp += heal
+
+    elif decide[0] == "s":
+        print("trap set\nnighttime attacks prevented\nmaybe food tomorrow morning")
+
+    elif decide[0] == "m":
+        print("log of {}".format(player.name))
+        print("hp [{}]".format(player.hp))
+        print("strv level [{}]".format(player.sLVL))
+        print("wtr level [{}]".format(player.wLVL))
+        print("exhaustion level [{}]".format(player.eLVL))
