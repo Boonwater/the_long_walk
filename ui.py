@@ -55,7 +55,7 @@ def verifyInput(acceptedInput):
 
 
 def prompt(message, functionToRun=None):
-    printS(message + " [y/n]:", .02)
+    printS(message + " [y/n]")
     choice = verifyInput(["y", "n"])
 
     if functionToRun is not None and choice == "y":

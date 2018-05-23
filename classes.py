@@ -3,6 +3,7 @@
 import random
 import getch
 import sys
+import ui
 
 class journey:
     """ the journey """
@@ -74,5 +75,12 @@ def camp(player):
     while True:
         char = getch.getch()
         print(char, "")
-        if char in actions:
+        if char == "\n" and decide in actions:
             print("you have decided to {}".format(decide))
+            ui.prompt("Is this correct", decide)
+
+        elif char == "\n" and decide not in actions:
+            decide = ""
+            print("input invalid")
+
+        decide += char
