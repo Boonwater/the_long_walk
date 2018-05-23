@@ -1,3 +1,4 @@
+""" ui.py """
 import linecache
 import termcolor
 import hashlib
