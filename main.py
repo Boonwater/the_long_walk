@@ -17,7 +17,6 @@ def game():
     pc = player.__init__(player, input("name\n> "))
     while path.length > 0:
         travel(path, pc)
-        camp(pc)
     print("you have survived")
     print("shove off")
 
