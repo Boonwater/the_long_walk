@@ -64,6 +64,7 @@ def travel(journey, pc):
 
         journey.length -= 1
 
+    player.consume(pc)
     print("you now have a total of {} miles to travel".format(journey.length))
     camp(pc, trek)
 
@@ -75,17 +76,17 @@ class player:
         self.eLVL = 0 # exhaustion level
         self.sLVL = 0 # starvation level
         self.wLVL = 0 # terminal dehydration level
-        self.fodLVL = 14 # if this hits 0, starvation sets in
-        self.wtrLVL = 3 # if this hits 0, terminal dehydration sets in
-        self.strdFOD = 6 # stored food
-        self.strdWTR = 2 # stored water
+        self.fodLVL = 0 # if this hits 0, starvation sets in
+        self.wtrLVL = 0 # if this hits 0, terminal dehydration sets in
+        self.strdFOD = 0 # stored food
+        self.strdWTR = 0 # stored water
         return self
 
     def checkDebuff(self):
         print("strv level [{}]".format(self.sLVL))
         print("wtr level [{}]".format(self.wLVL))
         print("exhaustion level [{}]".format(self.eLVL))
-        for _ in range(self.eLVl):
+        for _ in range(self.eLVL):
             print("you took {} exhaustion damage".format(round(self.hp / 4)))
             self.hp -= round((self.hp / 4))
 
@@ -103,11 +104,41 @@ class player:
         if self.alive is False:
             return "d"
 
+    def consume(self):
+        print("after a full day, a full stomach is it's reward...\nprovided you have the supplies for it.")
+        self.strdFOD -= 3
+        if self.strdFOD <= 0:
+            self.fodLVL + self.strdFOD
+            self.strdFOD = 0
+            print("you have no food stored")
+            print("running on fumes... waiting for a quiet death.")
+            if self.fodLVL <= 0:
+                self.sLVL += 1
+                self.fodLVL = 0
+                print("such a little thing to perish for... a bite of bread")
+
+
+        self.strdWTR -= 1
+        if self.strdWTR <= 0:
+            self.wtrLVL + self.strdWTR
+            print("you have no stored water")
+            print("as fatigue sets in, a creeping doubt begins...")
+            if self.wtrLVL <= 0:
+                self.wLVL += 1
+                self.wtrLVL = 0
+                print("delerium is a common side effect of terminal dehydration. survival is not.")
+
+        if self.wtrLVL < 0: self.wtrLVL = 0
+        if self.strdWTR < 0: self.strdWTR = 0
+        if self.fodLVL < 0: self.fodLVL = 0
+        if self.strdFOD < 0: self.strdFOD = 0
+
+
 def camp(player, trek):
     print("\nIt is time to camp, as the night grows longer.")
     print("What would you like to do")
     print("W[Forward] /S[Back] /Enter[Done]")
-    actions = ["make fire", "find food", "wound care", "set trap", "menu", "sleep"]
+    actions = ["make fire", "find food", "wound care", "set trap", "menu", "sleep", "suicide"]
 
     decide = ""
     iterate = -1
@@ -116,14 +147,14 @@ def camp(player, trek):
         char = getch.getch()
         if char.lower() == "w":
             iterate += 1
-            if iterate > 5:
-                iterate -= 5
+            if iterate > 6:
+                iterate -= 6
             print("currently considering {}          ".format(actions[iterate]), "\r", 0)
 
         if char.lower() == "s":
             iterate -= 1
             while iterate < 0:
-                iterate = 5
+                iterate = 6
             print("currently considering {}          ".format(actions[iterate]), "\r", 0)
 
 
@@ -145,26 +176,31 @@ def do(decide, player, time):
         print("{} hours left".format(time - 2))
         return 2
 
-    elif decide[0] == "f":
+    elif decide == "find food":
         print("food gathered")
         player.strdFOD += random.randint(1, 4)
         player.strdWTR += random.randint(1, 3)
+        if player.fodLVL == 0:
+            player.fodLVL += player.strdFOD
+
+        if player.wtrLVL == 0:
+            player.wtrLVL += player.strdWTR
         print("{} hours left".format(time - 1))
         return 1
 
-    elif decide[0] == "w":
+    elif decide == "wound care":
         heal = random.randint(1, 4)
         print("wounds bandaged successfully, {} hp healed".format(heal))
         player.hp += heal
         print("{} hours left".format(time - 2))
         return 2
 
-    elif decide[4] == "t":
+    elif decide == "set trap":
         print("trap set\nnighttime attacks prevented\npossible food tomorrow morning")
         print("{} hours left".format(time - 3))
         return 3
 
-    elif decide[0] == "m":
+    elif decide == "menu":
         print("log of {}".format(player.name))
         print("hp [{}]".format(player.hp))
         print("fod [{}]".format(player.fodLVL))
@@ -176,7 +212,7 @@ def do(decide, player, time):
         print("exhaustion level [{}]".format(player.eLVL))
         return 0
 
-    elif decide[1] == "l":
+    elif decide == "sleep":
         print("slept {} hours".format(time))
         if time >= 5:
             recovered = round((time - 5) / 2)
@@ -190,3 +226,9 @@ def do(decide, player, time):
             player.eLVL += 1
 
         return time
+
+    elif decide == "suicide":
+        print("insanity sets in... creeping monsters of the mind urge you...")
+        print("the noose is a comfortable perch.")
+        print("you stand a monument to your own failure.")
+        sys.exit(0)
