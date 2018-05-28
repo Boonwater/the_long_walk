@@ -147,8 +147,8 @@ def do(decide, player, time):
 
     elif decide[0] == "f":
         print("food gathered")
-        self.strdFOD += random.randint(1, 4)
-        self.strdWTR += random.randint(1, 3)
+        player.strdFOD += random.randint(1, 4)
+        player.strdWTR += random.randint(1, 3)
         print("{} hours left".format(time - 1))
         return 1
 
