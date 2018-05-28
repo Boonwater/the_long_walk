@@ -3,22 +3,13 @@ import random
 import builtins
 from classes import *
 import getch
-import linecache
-import termcolor
-import hashlib
-import termios
-import random
-import getch
-import time
-import sys
-import os
-
+from ui import *
 
 builtins.print = printS
 
 def main():
     while True:
-        print("...\nThe\nLong\nWalk\n...")
+        print(0, "...\nThe\nLong\nWalk\n...")
         game()
 
 def game():
@@ -26,88 +17,10 @@ def game():
     pc = player.__init__(player, input("name\n> "))
     while path.length > 0:
         travel(path, pc)
-    print("you have survived")
-    print("shove off")
+    print(0, "you have survived")
+    print(0, "shove off")
 
 
-def printS(text, end="\n", delay = .02, color=None):
-    enableEcho(False)
-    for char in text:
-        if color is not None:
-            sys.stdout.write(termcolor.colored(char.lower(), color))
-        else:
-            sys.stdout.write(char.lower())
-
-        sys.stdout.flush()
-        time.sleep(delay)
-
-    sys.stdout.write(end)
-
-    enableEcho(True)
-
-    # flush input
-    termios.tcflush(sys.stdin, termios.TCIFLUSH)
-
-
-def verifyInput(acceptedInput):
-    printS("\n> ", "")
-    choice = input()
-    choice = choice.lower()
-
-    # convert all accepted input to lowercase (disable if need be)
-    acceptedInput = [x.lower() for x in acceptedInput]
-    firstRun = True
-
-    while choice not in acceptedInput:
-        if firstRun:
-            replaceLines(1)
-            firstRun = False
-        else:
-            replaceLines(3)
-
-        printS("\nInput invalid!\n", "\n", .02, "red")
-
-        printS("> ", "")
-        choice = input()
-        choice = choice.lower()
-
-    return choice
-
-
-def prompt(message, functionToRun=None):
-    printS(message + " [y/n]")
-    choice = verifyInput(["y", "n"])
-
-    if functionToRun is not None and choice == "y":
-        functionToRun()
-        return
-
-    return choice
-
-
-def cls():
-    os.system("clear")
-
-
-def replaceLines(linesToDelete):
-    cursorOneUp = "\x1b[1A"
-    eraseLine = "\x1b[2K"
-
-    for _ in range(linesToDelete):
-        sys.stdout.write(cursorOneUp)
-        sys.stdout.write(eraseLine)
-
-
-# from https://gist.github.com/kgriffs/5726314
-def enableEcho(enable):
-    fd = sys.stdin.fileno()
-    new = termios.tcgetattr(fd)
-    if enable:
-        new[3] |= termios.ECHO
-    else:
-        new[3] &= ~termios.ECHO
-
-    termios.tcsetattr(fd, termios.TCSANOW, new)
 
 if __name__ == "__main__":
     main()
