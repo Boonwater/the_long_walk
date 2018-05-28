@@ -3,7 +3,6 @@
 import random
 import getch
 import sys
-import ui
 
 class journey:
     """ the journey """
