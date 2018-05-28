@@ -76,25 +76,17 @@ class player:
         self.eLVL = 0 # exhaustion level
         self.sLVL = 0 # starvation level
         self.wLVL = 0 # terminal dehydration level
-        self.fodLVL = 0 # if this hits 0, starvation sets in
-        self.wtrLVL = 0 # if this hits 0, terminal dehydration sets in
-        self.strdFOD = 0 # stored food
-        self.strdWTR = 0 # stored water
+        self.fodLVL = 9  # if this hits 0, starvation sets in
+        self.wtrLVL = 3 # if this hits 0, terminal dehydration sets in
+        self.strdFOD = 6 # stored food
+        self.strdWTR = 2 # stored water
         return self
 
     def checkDebuff(self):
         print("strv level [{}]".format(self.sLVL))
         print("wtr level [{}]".format(self.wLVL))
         print("exhaustion level [{}]".format(self.eLVL))
-        for _ in range(self.eLVL):
-            print("you took {} exhaustion damage".format(round(self.hp / 4)))
-            self.hp -= round((self.hp / 4))
-
-        if self.wLVL >= 3:
-            print("you slowly succumb to the water leaving you, with none to replace it.\n you perish painlessly, quietly.")
-
-
-        return 0
+        print("DEVELOPER [non implemented]")
 
     def checkAlive(self, length):
         if self.hp <= 0:
