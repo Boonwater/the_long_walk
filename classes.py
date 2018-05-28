@@ -74,12 +74,25 @@ class player:
         self.alive = True
         self.eLVL = 0 # exhaustion level
         self.sLVL = 0 # starvation level
-        self.wLVL = 0 # wateration level
+        self.wLVL = 0 # terminal dehydration level
+        self.fodLVL = 14 # if this hits 0, starvation sets in
+        self.wtrLVL = 3 # if this hits 0, terminal dehydration sets in
+        self.strdFOD = 6 # stored food
+        self.strdWTR = 2 # stored water
         return self
 
     def checkDebuff(self):
-        # todo after debuffs from starvation, etc. are implemented
-        print("dev")
+        print("strv level [{}]".format(self.sLVL))
+        print("wtr level [{}]".format(self.wLVL))
+        print("exhaustion level [{}]".format(self.eLVL))
+        for _ in range(self.eLVl):
+            print("you took {} exhaustion damage".format(round(self.hp / 4)))
+            self.hp -= round((self.hp / 4))
+
+        if self.wLVL >= 3:
+            print("you slowly succumb to the water leaving you, with none to replace it.\n you perish painlessly, quietly.")
+
+
         return 0
 
     def checkAlive(self, length):
@@ -118,7 +131,7 @@ def camp(player, trek):
             decide = actions[iterate]
             for _ in actions:
                 if decide in _:
-                    print("you have decided to {}".format(decide))
+                    print("you have decided to {}       ".format(decide))
                     time -= do(decide, player, time)
 
             decide = ""
@@ -134,8 +147,8 @@ def do(decide, player, time):
 
     elif decide[0] == "f":
         print("food gathered")
-        # adds food
-        # also adds water
+        self.strdFOD += random.randint(1, 4)
+        self.strdWTR += random.randint(1, 3)
         print("{} hours left".format(time - 1))
         return 1
 
@@ -154,8 +167,12 @@ def do(decide, player, time):
     elif decide[0] == "m":
         print("log of {}".format(player.name))
         print("hp [{}]".format(player.hp))
+        print("fod [{}]".format(player.fodLVL))
+        print("wtr [{}]".format(player.wtrLVL))
+        print("strd fod [{}]".format(player.strdFOD))
+        print("strd wtr [{}]".format(player.strdWTR))
         print("strv level [{}]".format(player.sLVL))
-        print("wtr level [{}]".format(player.wLVL))
+        print("term dhydrt level [{}]".format(player.wLVL))
         print("exhaustion level [{}]".format(player.eLVL))
         return 0
 
