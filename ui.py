@@ -58,17 +58,6 @@ def verifyInput(acceptedInput):
     return choice
 
 
-def prompt(message, functionToRun=None):
-    printS(message + " [y/n]")
-    choice = verifyInput(["y", "n"])
-
-    if functionToRun is not None and choice == "y":
-        functionToRun()
-        return
-
-    return choice
-
-
 def cls():
     os.system("clear")
 

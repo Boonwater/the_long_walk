@@ -3,6 +3,7 @@
 import random
 import getch
 import sys
+from debuff import *
 
 class journey:
     """ the journey """
@@ -26,13 +27,17 @@ def travel(journey, pc):
             char = getch.getch()
             if char.lower() == "w":
                 trek += 1
+                if trek > pc.maxDistance:
+                    trek = pc.maxDistance
             elif char.lower() == "s":
                 trek -= 1
+                if trek < 0:
+                    trek = 0
 
             elif char.lower() == "\n":
                 break
-
-            print(pc.insanity, "\rtrekking {} miles    ".format(trek), "\r", 0)
+            print(pc.insanity, "\x1b[1A\x1b[1A\r[{}{}]".format("#" * (trek), " " * (pc.maxDistance - trek)), "", 0)
+            print(pc.insanity, "trekking {} miles    ".format(trek), "", 0)
 
 
 
@@ -45,6 +50,7 @@ def travel(journey, pc):
     trap = trek * 2
     if trap > 10:
         trap = 10
+    print(0, "", "\n")
     for _ in range(trek):
         if random.randint(0, 100) < attack:
             damage = random.randint(0, 3)
@@ -75,11 +81,13 @@ class player:
         self.eLVL = 0 # exhaustion level
         self.sLVL = 0 # starvation level
         self.wLVL = 0 # terminal dehydration level
-        self.fodLVL = 9  # if this hits 0, starvation sets in
-        self.wtrLVL = 3 # if this hits 0, terminal dehydration sets in
-        self.strdFOD = 6 # stored food
-        self.strdWTR = 2 # stored water
+        self.fodLVL = 3  # if this hits 0, starvation sets in
+        self.wtrLVL = 1 # if this hits 0, terminal dehydration sets in
+        self.strdFOD = 0 # stored food
+        self.strdWTR = 0 # stored water
         self.insanity = 0 # fun, right? screws up ui.
+        self.maxDistance = 16 # maximum travel distance
+        self.sleepNeed = 5
         return self
 
     def checkDebuff(self):
@@ -87,17 +95,17 @@ class player:
         if self.sLVL > 0:
             print(self.insanity, "starvation sets in... death approaches")
             self.insanity += 10
-            #starve(self)
+            starve(self)
 
         if self.wLVL > 0:
             print(self.insanity, "you are quickly running out of your invisible water...\nand your sanity.")
             self.insanity += 20
-            #dehydrate(self)
+            dehydrate(self)
 
         if self.eLVL > 0:
             print(self.insanity, "you are so, so, tired... why not sleep forever")
             self.insanity += 5
-            #exhaust(self)
+            exhaust(self)
 
 
     def checkAlive(self, length):
@@ -132,14 +140,22 @@ class player:
                 self.wtrLVL = 0
                 print(self.insanity, "delerium is a common side effect of terminal dehydration. survival is not.")
 
-        if self.wtrLVL < 0: self.wtrLVL = 0
-        if self.strdWTR < 0: self.strdWTR = 0
-        if self.fodLVL < 0: self.fodLVL = 0
-        if self.strdFOD < 0: self.strdFOD = 0
+        if self.wtrLVL < 0:
+            self.wtrLVL = 0
+
+        if self.strdWTR < 0:
+            self.strdWTR = 0
+
+        if self.fodLVL < 0:
+            self.fodLVL = 0
+
+        if self.strdFOD < 0:
+            self.strdFOD = 0
+
+        self.checkDebuff(self)
 
 
 def camp(player, trek):
-    player.checkDebuff(player)
     print(player.insanity, "\nIt is time to camp, as the night grows longer.")
     print(player.insanity, "What would you like to do")
     print(player.insanity, "W[Forward] /S[Back] /Enter[Done]")
@@ -147,7 +163,7 @@ def camp(player, trek):
 
     decide = ""
     iterate = -1
-    time = 24 - round(trek / 3)
+    time = 12 - round(trek / 2)
     while time > 0:
         char = getch.getch()
         if char.lower() == "w":
@@ -175,6 +191,7 @@ def camp(player, trek):
 
 
 def do(decide, player, time):
+
     if player.insanity == 100:
         decide = "suicide"
     if decide == "make fire":
@@ -217,6 +234,7 @@ def do(decide, player, time):
         print(player.insanity, "strv level [{}]".format(player.sLVL))
         print(player.insanity, "term dhydrt level [{}]".format(player.wLVL))
         print(player.insanity, "exhaustion level [{}]".format(player.eLVL))
+        print(player.insanity, "insanity [{}]".format(player.insanity))
         return 0
 
     elif decide == "sleep":
@@ -228,14 +246,19 @@ def do(decide, player, time):
             if player.eLVL < 0:
                 player.eLVL = 0
 
-        elif time < 5:
-            print(player.insanity, "insufficent sleep [5 hrs required] [+1 lvl exhaustion]")
+        elif time < pc.sleepNeed:
+            print(player.insanity, "insufficent sleep [{} hrs required] [+1 lvl exhaustion]".format(player.sleepNeed))
             player.eLVL += 1
+            player.insanity += 10
+
 
         return time
 
     elif decide == "suicide":
+        player.insanity += 40
         print(player.insanity, "insanity sets in... creeping monsters of the mind urge you...")
+        player.insanity += 60
         print(player.insanity, "the noose is a comfortable perch.")
+        player.insanity += 100
         print(player.insanity, "you stand a monument to your own failure.")
         sys.exit(0)
